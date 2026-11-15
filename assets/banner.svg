@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 240" width="1280" height="240" role="img" aria-label="KRAI — MLPerf Endpoints v1.0 results">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#021528"/><stop offset="1" stop-color="#04203a"/></linearGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0d83cc"/><stop offset="1" stop-color="#2ef9fb"/></linearGradient>
+    <clipPath id="frame"><rect width="1280" height="240" rx="16"/></clipPath>
+  </defs>
+  <rect width="1280" height="240" rx="16" fill="url(#bg)"/>
+  <rect y="0" width="1280" height="4" fill="url(#rule)" opacity="0.9" clip-path="url(#frame)"/>
+  <svg x="64" y="97" width="175.5" height="46" viewBox="0 0 573.94 150.42"><defs><style>.wc1{fill:#fff;fill-rule:evenodd;}</style></defs><g  ><g  ><path class="wc1" d="M407.6.59,342.26,146.25H362c30.35-68.75,17.72-40.72,55.76-127.34,41.12,93.64,22.53,52.7,56,127.34h19.56L428,.59ZM269.14,146.25H292L244,92.35c41-.38,54.56-51.67,28.82-78C255.91-7.9,194.66,3,170.3.59V146.25h18.1V93.81h35.37ZM235.63,77.59H188.4V16.82c16.37,2,60.07-6.32,71.16,9.37,18,19.8,4.88,53.67-23.93,51.4M0,150.42H17.89V82l71,68.46h22.47v-1.26L37.94,77.59,111.32,6V4.76H88.85l-71,68.45V4.76H0Zm555.84-4.17h18.1V.59h-18.1Z"/></g></g></svg>
+  <svg x="255.5" y="63" width="71.4" height="120" viewBox="0 0 178.82 300.47"><defs><style>.ac1{fill:none;}.ac2{clip-path:url(#aclip);}.ac3{fill:url(#agrad);}.ac4{clip-path:url(#aclip-2);}.ac5{fill:url(#agrad-2);}.ac6{opacity:0.7;}.ac7{clip-path:url(#aclip-3);}.ac8{fill:#0d151c;}</style><clipPath id="aclip"><polygon class="ac1" points="0 178.83 44.7 178.83 71.11 185.82 89.42 178.83 178.82 0 0 178.83"/></clipPath><linearGradient id="agrad" x1="-866.71" y1="727.99" x2="-865.71" y2="727.99" gradientTransform="matrix(199.64, 0, 0, -199.64, 173047.94, 145431.05)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0d83cc"/><stop offset="1" stop-color="#2ef9fb"/></linearGradient><clipPath id="aclip-2"><polygon class="ac1" points="44.7 178.83 166.36 300.47 105.54 178.83 44.7 178.83"/></clipPath><linearGradient id="agrad-2" x1="-862.21" y1="726.07" x2="-861.21" y2="726.07" gradientTransform="matrix(-105.31, 0, 0, 105.31, -90690.83, -76218.91)" xlink:href="#agrad"/><clipPath id="aclip-3"><rect class="ac1" x="44.59" y="179.15" width="44.71" height="29.81"/></clipPath></defs><g  ><g  ><g class="ac2"><rect class="ac3" x="-33.73" y="-28.68" width="246.29" height="243.18" transform="translate(-33.73 131.15) rotate(-63.35)"/></g><g class="ac4"><rect class="ac5" x="44.7" y="178.83" width="121.66" height="121.65"/></g><g class="ac6"><g class="ac7"><polygon class="ac8" points="44.59 179.15 74.4 208.96 89.3 179.15 44.59 179.15"/></g></g></g></g></svg>
+  <rect x="371" y="60" width="1.5" height="120" fill="#3a4f63"/>
+  <g font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+    <text x="415" y="112" fill="#ffffff" font-size="44" font-weight="600" letter-spacing="-0.5">MLPerf Endpoints v1.0</text>
+    <text x="415" y="156" fill="#9fb2c3" font-size="24">DeepSeek-V4.1-Flash · Agentic Inference results</text>
+  </g>
+</svg>
