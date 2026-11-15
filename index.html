@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Endpoints Results Explorer</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f6f4; --surface-1: #fcfcfb; --border: #e3e2de; --grid: #ecebe7;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7974;
+  --accent: #2a78d6;
+  --good: #0f7b3e; --good-bg: #e3f4ea; --bad: #b42318; --bad-bg: #fde8e6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#6250d6; --s8:#e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #121211; --surface-1: #1a1a19; --border: #2e2e2c; --grid: #262624;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --accent: #3987e5;
+    --good: #5fd08f; --good-bg: #133222; --bad: #f2877c; --bad-bg: #3a1714;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#0ca30c; --s7:#9085e9; --s8:#e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #121211; --surface-1: #1a1a19; --border: #2e2e2c; --grid: #262624;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --accent: #3987e5;
+  --good: #5fd08f; --good-bg: #133222; --bad: #f2877c; --bad-bg: #3a1714;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#0ca30c; --s7:#9085e9; --s8:#e66767;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text-primary);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; }
+header h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--text-secondary); }
+h2 { font-size: 16px; margin: 0 0 12px; }
+section { margin-top: 28px; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface-1); cursor: pointer; font-size: 13px; color: var(--text-secondary); user-select: none; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip .sw { width: 14px; height: 4px; border-radius: 2px; background: var(--c); opacity: .35; }
+.chip.on { color: var(--text-primary); border-color: var(--text-muted); }
+.chip.on .sw { opacity: 1; }
+.chip:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-secondary); cursor: pointer; }
+.btn:hover { color: var(--text-primary); }
+select { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface-1); color: var(--text-primary); }
+label.inline { color: var(--text-secondary); font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 16px; }
+.chart-card h3 { font-size: 14px; margin: 0 0 2px; }
+.chart-card .sub { font-size: 12px; color: var(--text-muted); margin: 0 0 10px; }
+.chart-box { position: relative; height: 320px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 12px; color: var(--text-secondary); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; background: var(--c); display: inline-block; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+th { color: var(--text-secondary); font-weight: 600; position: sticky; top: 0; background: var(--surface-1); }
+th:first-child, td:first-child { text-align: left; }
+td.name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+td.name i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 8px; vertical-align: -1px; }
+td .d { color: var(--text-muted); font-size: 11px; margin-left: 4px; }
+td .d.up { color: var(--good); } td .d.down { color: var(--bad); }
+.badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge.pass { color: var(--good); background: var(--good-bg); }
+.badge.fail { color: var(--bad); background: var(--bad-bg); }
+.muted { color: var(--text-muted); }
+details { border-top: 1px solid var(--border); padding: 10px 0; }
+details summary { cursor: pointer; font-weight: 600; }
+details .meta { color: var(--text-secondary); font-size: 12px; margin: 8px 0; white-space: normal; }
+.toprow { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+footer { margin-top: 40px; color: var(--text-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header class="toprow">
+    <div>
+      <h1>MLPerf Endpoints v1.0 — DeepSeek-V4.1-Flash results by branch</h1>
+      <p>Every submission branch of KRAI submission branch, read from each point's
+        <code>result_summary.json</code>, <code>scores.json</code> and <code>swe_bench_results.json</code>; no results published yet.</p>
+    </div>
+    <button class="btn" id="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+  </header>
+
+  <section>
+    <div class="controls" id="chips" role="group" aria-label="Branches shown"></div>
+    <div class="controls" style="margin-top:10px">
+      <button class="btn" id="all" type="button">Show all</button>
+      <button class="btn" id="latest" type="button">Latest per system</button>
+      <label class="inline">Baseline for Δ
+        <select id="baseline"></select></label>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card chart-card"><h3>Throughput vs concurrency</h3>
+      <p class="sub">Client TPS: output tokens/s for the whole system</p>
+      <div class="chart-box"><canvas id="c-tps" aria-label="Throughput by concurrency"></canvas></div><div class="legend"></div></div>
+    <div class="card chart-card"><h3>Throughput vs interactivity</h3>
+      <p class="sub">Each point is one concurrency; up and right is better</p>
+      <div class="chart-box"><canvas id="c-pareto" aria-label="Throughput versus interactivity"></canvas></div><div class="legend"></div></div>
+    <div class="card chart-card"><h3>Throughput relative to baseline</h3>
+      <p class="sub">Percent of baseline TPS at the same concurrency</p>
+      <div class="chart-box"><canvas id="c-rel" aria-label="Relative throughput"></canvas></div><div class="legend"></div></div>
+    <div class="card chart-card"><h3>TTFT p90 vs concurrency</h3>
+      <p class="sub">Milliseconds, log scale</p>
+      <div class="chart-box"><canvas id="c-ttft" aria-label="TTFT p90 by concurrency"></canvas></div><div class="legend"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="toprow"><h2>Metric by concurrency</h2>
+      <div class="controls">
+        <label class="inline">Metric <select id="metric"></select></label>
+        <label class="inline"><input type="checkbox" id="showdelta" checked> Δ vs baseline</label>
+      </div></div>
+    <div class="tbl-wrap"><table id="pivot"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Accuracy gates</h2>
+    <p class="muted" style="margin:-6px 0 10px;font-size:12px">Inline ≥ 52.36 % · OSL per-turn mean 793–970 tokens · SWE-bench ≥ 96.4 % (only at points run with <code>--mode both</code>)</p>
+    <div class="tbl-wrap"><table id="acc"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>All points per branch</h2>
+    <div id="detail"></div>
+  </section>
+
+  <footer>Built by <code>scripts/results_site/build.py</code>. Raw rows: <a href="data.json">data.json</a>.</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const DATA = {"generated":"no results published yet","thresholds":{"inline_min":0.5236,"osl_min":793.0,"osl_max":970.0,"swe_min":0.964},"branches":[]};
+const B = DATA.branches, T = DATA.thresholds;
+if (!B.length) {
+  document.querySelector('main').innerHTML = '<header><h1>MLPerf Endpoints v1.0 — DeepSeek-V4.1-Flash results</h1>' +
+    '<p>No results have been published yet. Results appear here once their MLCommons submission is public.</p></header>';
+  throw new Error('no branches');
+}
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const slot = i => `--s${(i % 8) + 1}`;
+B.forEach((b, i) => { b.slot = slot(i); b.label = b.branch + (b.release ? ` (${b.release.split(/\s+/)[0]})` : '') + (b.unpushed ? ' · local, unpushed' : ''); });
+
+const METRICS = [
+  ['tps', 'Throughput (TPS)', 0, ''], ['tps_per_gpu', 'TPS per GPU', 0, ''], ['qps', 'QPS', 2, ''],
+  ['interactivity', 'Interactivity (tok/s/user)', 1, ''],
+  ['ttft_p50_ms', 'TTFT p50 (ms)', 0, 'lower'], ['ttft_p90_ms', 'TTFT p90 (ms)', 0, 'lower'], ['ttft_p99_ms', 'TTFT p99 (ms)', 0, 'lower'],
+  ['tpot_p50_ms', 'TPOT p50 (ms)', 1, 'lower'], ['tpot_p90_ms', 'TPOT p90 (ms)', 1, 'lower'],
+  ['latency_p50_s', 'Request latency p50 (s)', 2, 'lower'], ['latency_p90_s', 'Request latency p90 (s)', 1, 'lower'],
+  ['osl_mean', 'OSL mean (tokens)', 0, ''], ['duration_s', 'Duration (s)', 0, ''],
+];
+const fmt = (v, nd = 0) => v == null ? '–' : v.toLocaleString('en-US', { minimumFractionDigits: nd, maximumFractionDigits: nd });
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const concs = [...new Set(B.flatMap(b => b.points.map(p => p.concurrency)))].sort((a, b) => a - b);
+
+// ---- state
+function latestSet() {
+  const best = {};
+  B.forEach(b => { const k = b.chip + '|' + b.variant; if (!best[k] || b.date >= best[k].date) best[k] = b; });
+  return new Set(Object.values(best).map(b => b.branch));
+}
+let shown = latestSet();
+let baseline = (B.filter(b => b.chip === 'H200' && !b.variant).sort((a, b) => a.date < b.date ? 1 : -1)[0] || B[0]).branch;
+try { const s = JSON.parse(localStorage.getItem('erx') || 'null'); if (s) { shown = new Set(s.shown.filter(x => B.some(b => b.branch === x))); baseline = B.some(b => b.branch === s.baseline) ? s.baseline : baseline; } } catch (e) {}
+const save = () => { try { localStorage.setItem('erx', JSON.stringify({ shown: [...shown], baseline })); } catch (e) {} };
+
+// ---- controls
+const chips = document.getElementById('chips');
+B.forEach(b => {
+  const l = document.createElement('label'); l.className = 'chip'; l.style.setProperty('--c', `var(${b.slot})`);
+  l.innerHTML = `<input type="checkbox" value="${esc(b.branch)}"><span class="sw"></span>${esc(b.label)}`;
+  l.querySelector('input').addEventListener('change', e => { e.target.checked ? shown.add(b.branch) : shown.delete(b.branch); render(); });
+  chips.appendChild(l);
+});
+const bsel = document.getElementById('baseline');
+B.forEach(b => bsel.add(new Option(b.branch, b.branch)));
+bsel.addEventListener('change', () => { baseline = bsel.value; render(); });
+const msel = document.getElementById('metric');
+METRICS.forEach(([k, n]) => msel.add(new Option(n, k)));
+msel.addEventListener('change', renderPivot);
+document.getElementById('showdelta').addEventListener('change', renderPivot);
+document.getElementById('all').onclick = () => { shown = new Set(B.map(b => b.branch)); render(); };
+document.getElementById('latest').onclick = () => { shown = latestSet(); render(); };
+document.getElementById('theme').onclick = () => {
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
+  document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark'; render();
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+
+// ---- charts
+const charts = {};
+const vis = () => B.filter(b => shown.has(b.branch));
+const baseBy = () => Object.fromEntries((B.find(b => b.branch === baseline)?.points || []).map(p => [p.concurrency, p]));
+
+function chartOpts({ xLog = true, yLog = false, xTitle, yTitle, xTicks, tip }) {
+  const ink = css('--text-secondary'), grid = css('--grid'), muted = css('--text-muted');
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false, parsing: false,
+    interaction: { mode: 'nearest', intersect: false, axis: 'xy' },
+    plugins: { legend: { display: false },
+      tooltip: { backgroundColor: css('--surface-1'), titleColor: css('--text-primary'), bodyColor: ink,
+        borderColor: css('--border'), borderWidth: 1, padding: 10, boxPadding: 4, usePointStyle: true,
+        callbacks: { title: it => it[0].dataset.label, label: tip } } },
+    scales: {
+      x: { type: xLog ? 'logarithmic' : 'linear', title: { display: true, text: xTitle, color: muted },
+        grid: { color: grid }, border: { color: grid }, ticks: { color: muted, ...(xTicks || {}) },
+        ...(xLog ? { afterBuildTicks: ax => { ax.ticks = concs.map(v => ({ value: v })); } } : {}) },
+      y: { type: yLog ? 'logarithmic' : 'linear', title: { display: true, text: yTitle, color: muted },
+        grid: { color: grid }, border: { display: false }, ticks: { color: muted } } },
+  };
+}
+function ds(b, data) {
+  const c = css(b.slot), s = css('--surface-1');
+  return { label: b.label, data, borderColor: c, backgroundColor: c, borderWidth: 2, pointRadius: 4, pointHoverRadius: 6,
+    pointBorderColor: s, pointBorderWidth: 2, tension: 0 };
+}
+function draw(id, datasets, opts) {
+  charts[id]?.destroy();
+  charts[id] = new Chart(document.getElementById(id), { type: 'line', data: { datasets }, options: chartOpts(opts) });
+  const lg = document.getElementById(id).closest('.card').querySelector('.legend');
+  lg.innerHTML = datasets.map((d, i) => `<span style="--c:${d.borderColor}"><i></i>${esc(d.label)}</span>`).join('');
+}
+function renderCharts() {
+  const V = vis(), base = baseBy();
+  draw('c-tps', V.map(b => ds(b, b.points.map(p => ({ x: p.concurrency, y: p.tps, p })))),
+    { xTitle: 'Concurrency', yTitle: 'Tokens/s', tip: c => ` C${c.raw.p.concurrency}: ${fmt(c.raw.y)} tok/s (${fmt(c.raw.p.tps_per_gpu)}/GPU)` });
+  draw('c-pareto', V.map(b => ds(b, b.points.map(p => ({ x: p.interactivity, y: p.tps, p })))),
+    { xLog: false, xTitle: 'Interactivity (tok/s/user)', yTitle: 'Tokens/s',
+      tip: c => ` C${c.raw.p.concurrency}: ${fmt(c.raw.y)} tok/s at ${fmt(c.raw.x, 1)} tok/s/user` });
+  draw('c-rel', V.map(b => ds(b, b.points.filter(p => base[p.concurrency]).map(p => ({ x: p.concurrency, y: 100 * p.tps / base[p.concurrency].tps, p })))),
+    { xTitle: 'Concurrency', yTitle: `% of ${baseline}`, tip: c => ` C${c.raw.p.concurrency}: ${fmt(c.raw.y, 1)} % of baseline` });
+  draw('c-ttft', V.map(b => ds(b, b.points.map(p => ({ x: p.concurrency, y: p.ttft_p90_ms, p })))),
+    { yLog: true, xTitle: 'Concurrency', yTitle: 'TTFT p90 (ms)', tip: c => ` C${c.raw.p.concurrency}: ${fmt(c.raw.y)} ms` });
+}
+
+// ---- tables
+const nameCell = b => `<td class="name" style="--c:var(${b.slot})"><i></i>${esc(b.branch)}</td>`;
+function renderPivot() {
+  const [key, , nd, dir] = METRICS.find(m => m[0] === msel.value);
+  const delta = document.getElementById('showdelta').checked, base = baseBy();
+  let h = `<thead><tr><th>Branch</th>${concs.map(c => `<th>C${c}</th>`).join('')}</tr></thead><tbody>`;
+  for (const b of B) {
+    const by = Object.fromEntries(b.points.map(p => [p.concurrency, p]));
+    h += `<tr>${nameCell(b)}` + concs.map(c => {
+      const v = by[c]?.[key]; if (v == null) return '<td></td>';
+      let d = '';
+      const r = base[c]?.[key];
+      if (delta && b.branch !== baseline && r) {
+        const pc = 100 * (v / r - 1), better = dir === 'lower' ? pc < 0 : pc > 0;
+        d = `<span class="d ${Math.abs(pc) < 0.5 ? '' : better ? 'up' : 'down'}">${pc >= 0 ? '+' : ''}${pc.toFixed(1)}%</span>`;
+      }
+      return `<td>${fmt(v, nd)}${d}</td>`;
+    }).join('') + '</tr>';
+  }
+  document.getElementById('pivot').innerHTML = h + '</tbody>';
+}
+const gate = (ok, txt) => `<span class="badge ${ok ? 'pass' : 'fail'}">${ok ? '✓' : '✗'} ${txt}</span>`;
+function renderAcc() {
+  let h = '<thead><tr><th>Branch</th><th>C</th><th>Inline</th><th>OSL / turn</th><th>SWE-bench</th></tr></thead><tbody>';
+  for (const b of B) for (const p of b.points) {
+    if (p.inline_acc == null && p.swe_acc == null) continue;
+    h += `<tr>${nameCell(b)}<td>${p.concurrency}</td>
+      <td>${p.inline_acc == null ? '–' : gate(p.inline_acc >= T.inline_min, (100 * p.inline_acc).toFixed(2) + ' %')}</td>
+      <td>${p.osl_turn_mean == null ? '–' : gate(p.osl_turn_mean >= T.osl_min && p.osl_turn_mean <= T.osl_max, fmt(p.osl_turn_mean, 1))}</td>
+      <td>${p.swe_acc == null ? '<span class="muted">not run</span>' : gate(p.swe_acc >= T.swe_min, `${(100 * p.swe_acc).toFixed(1)} % (${p.swe_resolved}/${p.swe_total})`)}</td></tr>`;
+  }
+  document.getElementById('acc').innerHTML = h + '</tbody>';
+}
+function renderDetail() {
+  const cols = [['concurrency', 'C', 0], ['tps', 'TPS', 0], ['tps_per_gpu', 'TPS/GPU', 0], ['interactivity', 'tok/s/user', 1],
+    ['ttft_p50_ms', 'TTFT p50', 0], ['ttft_p90_ms', 'TTFT p90', 0], ['tpot_p50_ms', 'TPOT p50', 1], ['latency_p50_s', 'Lat p50 s', 2],
+    ['osl_mean', 'OSL', 0], ['samples', 'Samples', 0], ['failed', 'Failed', 0], ['duration_s', 'Dur s', 0]];
+  document.getElementById('detail').innerHTML = B.map(b => `<details><summary>${esc(b.branch)} <span class="muted">— ${esc(b.short_name || '')}</span></summary>
+    <div class="meta">${esc(b.config_summary || '')}<br>${esc(b.serving_framework || '')}<br>
+      ${b.release ? 'RELEASE: ' + esc(b.release) + '<br>' : ''}Head ${esc(b.commit)} · ${esc(b.commit_date)} · ${esc(b.commit_subject)}</div>
+    <div class="tbl-wrap"><table><thead><tr>${cols.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>
+    ${b.points.map(p => `<tr>${cols.map(([k, , nd]) => `<td>${fmt(p[k], nd)}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`).join('');
+}
+
+function render() {
+  chips.querySelectorAll('label').forEach(l => { const i = l.querySelector('input'); i.checked = shown.has(i.value); l.classList.toggle('on', i.checked); });
+  bsel.value = baseline; save();
+  if (window.Chart) renderCharts();
+  renderPivot();
+}
+renderAcc(); renderDetail(); render();
+</script>
+</body>
+</html>
